@@ -1,30 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Browser built-in AI</title>
     <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
       body {
         font-family: system-ui, sans-serif;
         margin: 0 auto;
+        padding-top: 2rem;
         max-width: 66ch;
+        line-height: 1.75;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+        h1 {
+          margin-bottom: 0.25rem;
+        }
+      }
+      main {
+        margin-bottom: 4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      summary {
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      code {
+        font-family: monospace;
+        font-size: 1.1rem;
+        background-color: #eee;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 0.25rem 1rem;
+        border: transparent;
+      }
+      th {
+        text-align: left;
+      }
+      fieldset {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        legend {
+          text-align: right;
+          padding: 0.5rem;
+          font-size: 1.1rem;
+          font-weight: bold;
+        }
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+      }
+      select {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 0.5rem;
+        border: none;
+        background-color: #eee;
+      }
+      textarea {
+        width: 100%;
+        height: 10rem;
+        font-size: 1.1rem;
+        padding: 0.5rem;
+        border: none;
+        outline: none;
+        border-radius: 0.25rem;
+        resize: none;
+        background-color: transparent;
+        color: black;
+      }
+      button {
+        border: none;
+        outline: none;
+        border-radius: 0.25rem;
+        padding: 0.5rem 1rem;
+        background-color: #333;
+        color: white;
+      }
+      output {
+        display: block;
+        visibility: hidden;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        background-color: #eee;
+      }
+      footer {
+        text-align: center;
+        font-size: 1.666rem;
+        opacity: 0.5;
       }
       @media (prefers-color-scheme: dark) {
         body {
           background-color: #111;
           color: #eee;
         }
+        code {
+          background-color: #333;
+        }
+        select {
+          background-color: #333;
+          color: white;
+        }
+        textarea {
+          color: white;
+        }
+        output {
+          background-color: #333;
+        }
       }
     </style>
   </head>
+  
   <body>
-    <h1>Browser built-in AI</h1>
-    <p>
-      A JavaScript (+ HTML) demo of <code>Translator</code>,
-      <code>LanguageDetector</code>, <code>Summarizer</code>, and
-      <code>[Re]Writer</code>
-    </p>
-    <p><small>Maybe <code>LanguageModel</code>, if I get access in time...</small></p>
+    <header>
+      <h1>Browser built-in AI</h1>
+      <p>
+        A JavaScript (+ HTML) demo of <code>Translator</code>,
+        <code>LanguageDetector</code>, <code>Summarizer</code>,
+        <code>Writer</code>, <code>Rewriter</code>, and
+        <code>LanguageModel</code>
+      </p>
+    </header>
+    
+    <main>
+      <details open>
+        <summary>API availability</summary>
+        <table>
+          <tbody>
+            <tr>
+              <td><code>Translator</code></td>
+              <td><span id="translator">unknown</span></td>
+            </tr>
+            <tr>
+              <td><code>LanguageDetector</code></td>
+              <td><span id="languagedetector">unknown</span></td>
+            </tr>
+            <tr>
+              <td><code>Summarizer</code></td>
+              <td><span id="summarizer">unknown</span></td>
+            </tr>
+            <tr>
+              <td><code>Writer</code></td>
+              <td><span id="writer">unknown</span></td>
+            </tr>
+            <tr>
+              <td><code>Rewriter</code></td>
+              <td><span id="rewriter">unknown</span></td>
+            </tr>
+            <tr>
+              <td><code>LanguageModel</code></td>
+              <td><span id="languagemodel">unknown</span></td>
+            </tr>
+            <tr>
+              <td><code>Magic</code></td>
+              <td><span id="magic">unknown</span></td>
+            </tr>
+            <tr>
+              <td>Model</td>
+              <td><span id="model">unknown</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
+
+      <section>
+        <h2>Writer</h2>
+        <form>
+          <fieldset>
+            <legend>Keep it short, McCarthy</legend>
+            <label for="prompt">Prompt the <code>Writer</code></label>
+            <textarea name="prompt" placeholder=""></textarea>
+            <output name="result"></output>
+          </fieldset>
+          <button type="submit">Write</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Rewriter</h2>
+        <form>
+          <fieldset>
+            <legend>Like a remix</legend>
+            <label for="style"><code>Rewriter</code> style</label>
+            <select name="style">
+              <option value="formal">Formal</option>
+              <option value="informal">Informal</option>
+              <option value="technical">Technical</option>
+              <option value="creative">Creative</option>
+              <option value="academic">Academic</option>
+            </select>
+            <output name="result"></output>
+          </fieldset>
+          <button type="submit">Rewrite</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Summarizer</h2>
+        <form>
+          <fieldset>
+            <legend>tldr</legend>
+            <output name="result"></output>
+          </fieldset>
+          <button type="submit">Summarize</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Translator</h2>
+        <form>
+          <fieldset>
+            <legend>No, Canadian is not an option</legend>
+            <label for="language"><code>Translator</code> output language</label>
+            <select name="language">
+              <option value="en">English</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="es">Spanish</option>
+            </select>
+            <output name="result"></output>
+          </fieldset>
+          <button type="submit">Translate</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>LanguageModel</h2>
+        <form>
+          <fieldset>
+            <legend>Magic 8-ball</legend>
+            <label for="prompt">Ask the <code>LanguageModel</code> about the translation</label>
+            <textarea name="prompt" placeholder=""></textarea>
+            <output name="result"></output>
+          </fieldset>
+          <button type="submit">Ask</button>
+        </form>
+      </section>
+    </main>
+    
+    <footer>𓅓</footer>
   </body>
+
+  <script type="module">
+    // --- API availability ---
+    const features = ['Translator', 'LanguageDetector', 'Summarizer', 'Writer', 'Rewriter', 'LanguageModel', 'Magic']
+    for (const feature of features) {
+      const $status = document.getElementById(feature.toLowerCase())
+      if (window[feature])  $status.textContent = '🟢 available'
+      else $status.textContent = '⛔️ nope'
+    }
+
+    // --- Model availability ---
+    const $modelStatus = document.getElementById('model')
+    const modelStatus = await Summarizer.availability()
+    $modelStatus.textContent = `"${modelStatus}"`
+  </script>
 </html>
