@@ -6,9 +6,11 @@
     <code>Translator</code>, 
     <code>LanguageDetector</code>, 
     <code>Summarizer</code>, 
-    and <code>[Re]Writer</code>
+    <code>Writer</code>,
+    <code>Rewriter</code>,
+    <code>Proofreader</code>, and
+    <code>LanguageModel</code>
   </p>
-  <p><small>Maybe <code>LanguageModel</code>, if I get access in time...</small></p>
 </div>
 
 ## Link dump
