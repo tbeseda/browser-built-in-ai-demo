@@ -1,4 +1,9 @@
+/// <reference types="../global.d.ts" />
+
 class ModelAvailability extends HTMLElement {
+  /** @type {HTMLTableSectionElement | null} */
+  $table = null;
+
   connectedCallback() {
     this.innerHTML = `
       <details id="model-availability" open>
@@ -8,16 +13,17 @@ class ModelAvailability extends HTMLElement {
         </table>
       </details>
     `;
+    this.$table = this.querySelector('#model-availability-tbody');
     this.checkModelAvailability();
   }
+
   async checkModelAvailability() {
-    const $table = this.querySelector('#model-availability-tbody');
-    if (!$table) return;
+    if (!this.$table) return;
 
     const $row = document.createElement('tr');
 
     const $feature = document.createElement('td');
-    const modelStatus = await window.Summarizer?.availability?.() ?? 'unknown';
+    const modelStatus = await Summarizer?.availability?.() ?? 'unknown';
     $feature.textContent = `Model download ("${modelStatus}")`;
     $row.appendChild($feature);
 
@@ -60,7 +66,7 @@ class ModelAvailability extends HTMLElement {
     $action.appendChild($button);
     $action.appendChild($progress);
     $row.appendChild($action);
-    $table.appendChild($row);
+    this.$table.appendChild($row);
 
     const $details = this.querySelector('details');
     if (modelStatus === 'available' && $details) {

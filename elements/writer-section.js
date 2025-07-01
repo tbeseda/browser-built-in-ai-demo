@@ -1,6 +1,17 @@
+/// <reference types="../global.d.ts" />
+
 class WriterSection extends HTMLElement {
+  /** @type {HTMLFormElement | null} */
+  $form = null;
+  /** @type {HTMLButtonElement | null} */
+  $proofread = null;
+  /** @type {HTMLTextAreaElement | null} */
+  $textarea = null;
+  /** @type {HTMLOutputElement | null} */
+  $output = null;
+
   get result() {
-    return this.textContent
+    return this.textContent;
   }
 
   async connectedCallback() {
@@ -10,7 +21,7 @@ class WriterSection extends HTMLElement {
         <form>
           <fieldset>
             <legend>Keep it short, McCarthy</legend>
-            <label for="prompt">Prompt the <code>Writer</code></label>
+            <label for="prompt">Prompt the <code>Writer</code> for a short story</label>
             <textarea name="prompt" placeholder=""></textarea>
             <output name="result"></output>
           </fieldset>
@@ -18,45 +29,39 @@ class WriterSection extends HTMLElement {
           <button type="submit">Write</button>
         </form>
       </section>
-    `
+    `;
 
+    this.$form = this.querySelector('form');
+    if (!this.$form) return;
+    this.$proofread = this.$form.querySelector('button#proofread');
+    this.$textarea = this.$form.querySelector('textarea[name="prompt"]');
+    this.$output = this.$form.querySelector('output[name="result"]');
+    if (!this.$proofread || !this.$textarea || !this.$output) return;
 
-    /** @type {HTMLFormElement | null} */
-    const $form = this.querySelector('form')
-    if (!$form) return;
+    this.$proofread.disabled = true;
+    this.$form.addEventListener('submit', this.onSubmit.bind(this));
+  }
 
-    /** @type {HTMLButtonElement | null} */
-    const $proofread = $form.querySelector('button#proofread')
-    if (!$proofread) return;
-    /** @type {HTMLTextAreaElement | null} */
-    const $textarea = $form.querySelector('textarea[name="prompt"]')
-    /** @type {HTMLOutputElement | null} */
-    const $output = $form.querySelector('output[name="result"]')
-    if (!$textarea || !$output) return;
+  async onSubmit(e) {
+    e.preventDefault();
+    if (!this.$output || !this.$textarea) return;
+    this.$output.textContent = 'Writing...';
+    this.$output.style.visibility = 'visible';
 
-    $proofread.disabled = true;
+    const writer = await Writer.create({
+      sharedContext: 'Create a short story with a beginning, middle, and end.',
+      format: 'plain-text',
+      tone: 'casual',
+      length: 'short',
+    });
 
-    $form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      $output.textContent = 'Writing...'
-      $output.style.visibility = 'visible'
+    const stream = writer.writeStreaming(this.$textarea.value);
+    this.$output.textContent = '';
+    for await (const chunk of stream) this.$output.textContent += chunk;
 
-      const writer = await Writer.create({
-        sharedContext: 'Create a short story with a beginning, middle, and end.',
-        format: 'plain-text',
-        tone: 'casual',
-        length: 'short',
-      })
+    writer.destroy();
 
-      const stream = writer.writeStreaming($textarea.value)
-      $output.textContent = ''
-      for await (const chunk of stream) $output.textContent += chunk
-
-      writer.destroy()
-
-      // emit "written" event
-      document.dispatchEvent(new CustomEvent('written', { detail: $output.textContent }))
-    })
+    document.dispatchEvent(new CustomEvent('written', { detail: this.$output.textContent }));
   }
 }
 customElements.define('writer-section', WriterSection);

@@ -1,4 +1,17 @@
+/// <reference types="../global.d.ts" />
+
 class TranslatorSection extends HTMLElement {
+  /** @type {HTMLFormElement | null} */
+  $form = null;
+  /** @type {HTMLSelectElement | null} */
+  $select = null;
+  /** @type {HTMLOutputElement | null} */
+  $output = null;
+  /** @type {HTMLButtonElement | null} */
+  $button = null;
+  /** @type {string | undefined} */
+  rewritten = undefined;
+
   connectedCallback() {
     this.innerHTML = /* html */ `
       <section id="translator">
@@ -8,56 +21,54 @@ class TranslatorSection extends HTMLElement {
             <legend>No, Canadian is not an option</legend>
             <label for="language"><code>Translator</code> output language</label>
             <select name="language">
+              <option value="no">Norwegian</option>
+              <option value="es">Spanish</option>
               <option value="fr">French</option>
               <option value="de">German</option>
-              <option value="es">Spanish</option>
-              <option value="no">Norwegian</option>
             </select>
             <output name="result"></output>
           </fieldset>
           <button disabled type="submit">Translate</button>
         </form>
       </section>
-    `
+    `;
 
-    /** @type {HTMLFormElement | null} */
-    const $form = this.querySelector('form')
-    if (!$form) return;
+    this.$form = this.querySelector('form');
+    if (!this.$form) return;
+    this.$select = this.$form.querySelector('select[name="language"]');
+    this.$output = this.$form.querySelector('output[name="result"]');
+    this.$button = this.$form.querySelector('button[type="submit"]');
+    if (!this.$select || !this.$output || !this.$button) return;
 
-    /** @type {HTMLSelectElement | null} */
-    const $select = $form.querySelector('select[name="language"]')
-    if (!$select) return;
-    /** @type {HTMLOutputElement | null} */
-    const $output = $form.querySelector('output[name="result"]')
-    if (!$output) return;
-    /** @type {HTMLButtonElement | null} */
-    const $button = $form.querySelector('button[type="submit"]')
-    if (!$button) return;
+    document.addEventListener('rewritten', this.onRewritten.bind(this));
+    this.$form.addEventListener('submit', this.onSubmit.bind(this));
+  }
 
-    let rewritten
-    document.addEventListener('rewritten', (event) => {
-      if ('detail' in event) {
-        rewritten = event.detail
-        $button.disabled = false
-      }
-    })
+  onRewritten(event) {
+    if ('detail' in event) {
+      this.rewritten = event.detail;
+      if (this.$button) this.$button.disabled = false;
+    }
+  }
 
-    $form.addEventListener('submit', async (event) => {
-      event.preventDefault()
-      $output.textContent = 'Translating...'
-      $output.style.visibility = 'visible'
+  async onSubmit(event) {
+    event.preventDefault();
+    if (!this.$output || !this.$select) return;
+    if (!this.rewritten) return;
 
-      const translator = await Translator.create({
-        sourceLanguage: 'en',
-        targetLanguage: $select.value,
-      })
+    this.$output.textContent = 'Translating...';
+    this.$output.style.visibility = 'visible';
 
-      const stream = translator.translateStreaming(rewritten)
-      $output.textContent = ''
-      for await (const chunk of stream) $output.textContent += chunk
+    const translator = await Translator.create({
+      sourceLanguage: 'en',
+      targetLanguage: this.$select.value,
+    });
 
-      translator.destroy()
-    })
+    const stream = translator.translateStreaming(this.rewritten);
+    this.$output.textContent = '';
+    for await (const chunk of stream) this.$output.textContent += chunk;
+
+    translator.destroy();
   }
 }
 customElements.define('translator-section', TranslatorSection);

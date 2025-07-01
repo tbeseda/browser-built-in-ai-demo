@@ -153,7 +153,7 @@ interface WriterConstructor {
   create(options?: WriterOptions): Promise<Writer>;
 }
 
-declare var Writer: WriterConstructor;
+declare var Writer: any;
 
 // Rewriter API
 interface RewriterOptions {

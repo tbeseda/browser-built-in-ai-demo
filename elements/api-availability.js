@@ -1,4 +1,7 @@
 class ApiAvailability extends HTMLElement {
+  /** @type {HTMLTableSectionElement | null} */
+  $table = null;
+
   connectedCallback() {
     this.innerHTML = `
       <details id="api-availability" open>
@@ -8,12 +11,13 @@ class ApiAvailability extends HTMLElement {
         </table>
       </details>
     `;
+    this.$table = this.querySelector('#api-availability-tbody');
     this.checkApiAvailability();
   }
+
   checkApiAvailability() {
     const features = ['Translator', 'LanguageDetector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader', 'LanguageModel'];
-    const $apiTbody = this.querySelector('#api-availability-tbody');
-    if (!$apiTbody) return;
+    if (!this.$table) return;
 
     const missing = [];
     for (const feature of features) {
@@ -32,7 +36,7 @@ class ApiAvailability extends HTMLElement {
       }
 
       $row.appendChild($status);
-      $apiTbody.appendChild($row);
+      this.$table.appendChild($row);
     }
 
     if (missing.length > 0) {

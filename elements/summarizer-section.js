@@ -1,4 +1,15 @@
+/// <reference types="../global.d.ts" />
+
 class SummarizerSection extends HTMLElement {
+  /** @type {HTMLFormElement | null} */
+  $form = null;
+  /** @type {HTMLOutputElement | null} */
+  $output = null;
+  /** @type {HTMLButtonElement | null} */
+  $button = null;
+  /** @type {string | undefined} */
+  rewritten = undefined;
+
   connectedCallback() {
     this.innerHTML = /* html */ `
       <section id="summarizer">
@@ -11,44 +22,45 @@ class SummarizerSection extends HTMLElement {
           <button disabled type="submit">Summarize</button>
         </form>
       </section>
-    `
+    `;
 
-    /** @type {HTMLFormElement | null} */
-    const $form = this.querySelector('form')
-    if (!$form) return;
+    this.$form = this.querySelector('form');
+    if (!this.$form) return;
+    this.$output = this.$form.querySelector('output[name="result"]');
+    this.$button = this.$form.querySelector('button[type="submit"]');
+    if (!this.$output || !this.$button) return;
 
-    /** @type {HTMLOutputElement | null} */
-    const $output = $form.querySelector('output[name="result"]')
-    /** @type {HTMLButtonElement | null} */
-    const $button = $form.querySelector('button[type="submit"]')
-    if (!$output || !$button) return;
+    document.addEventListener('rewritten', this.onRewritten.bind(this));
+    this.$form.addEventListener('submit', this.onSubmit.bind(this));
+  }
 
-    let rewritten
-    document.addEventListener('rewritten', (event) => {
-      if ('detail' in event) {
-        rewritten = event.detail
-        $button.disabled = false
-      }
-    })
+  onRewritten(event) {
+    if ('detail' in event) {
+      this.rewritten = event.detail;
+      if (this.$button) this.$button.disabled = false;
+    }
+  }
 
-    $form.addEventListener('submit', async (event) => {
-      event.preventDefault()
-      $output.textContent = 'Summarizing...'
-      $output.style.visibility = 'visible'
+  async onSubmit(event) {
+    event.preventDefault();
+    if (!this.$output) return;
+    if (!this.rewritten) return;
 
-      const summarizer = await Summarizer.create({
-        sharedContext: 'An engaging teaser for a short story. Do not spoil the ending.',
-        format: 'plain-text',
-        length: 'short',
-        type: 'teaser',
-      })
+    this.$output.textContent = 'Summarizing...';
+    this.$output.style.visibility = 'visible';
 
-      const stream = summarizer.summarizeStreaming(rewritten)
-      $output.textContent = ''
-      for await (const chunk of stream) $output.textContent += chunk
+    const summarizer = await Summarizer.create({
+      sharedContext: 'An engaging teaser for a short story. Do not spoil the ending.',
+      format: 'plain-text',
+      length: 'short',
+      type: 'teaser',
+    });
 
-      summarizer.destroy()
-    })
+    const stream = summarizer.summarizeStreaming(this.rewritten);
+    this.$output.textContent = '';
+    for await (const chunk of stream) this.$output.textContent += chunk;
+
+    summarizer.destroy();
   }
 }
 customElements.define('summarizer-section', SummarizerSection);

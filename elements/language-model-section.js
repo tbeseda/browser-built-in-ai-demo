@@ -1,4 +1,17 @@
+/// <reference types="../global.d.ts" />
+
 class LanguageModelSection extends HTMLElement {
+  /** @type {HTMLFormElement | null} */
+  $form = null;
+  /** @type {HTMLTextAreaElement | null} */
+  $textarea = null;
+  /** @type {HTMLOutputElement | null} */
+  $output = null;
+  /** @type {HTMLButtonElement | null} */
+  $button = null;
+  /** @type {string | undefined} */
+  rewritten = undefined;
+
   connectedCallback() {
     this.innerHTML = /* html */ `
       <section id="language-model">
@@ -13,34 +26,32 @@ class LanguageModelSection extends HTMLElement {
           <button disabled type="submit">Ask</button>
         </form>
       </section>
-    `
+    `;
 
-    /** @type {HTMLFormElement | null} */
-    const $form = this.querySelector('form')
-    if (!$form) return;
+    this.$form = this.querySelector('form');
+    if (!this.$form) return;
+    this.$textarea = this.$form.querySelector('textarea[name="prompt"]');
+    this.$output = this.$form.querySelector('output[name="result"]');
+    this.$button = this.$form.querySelector('button[type="submit"]');
+    if (!this.$textarea || !this.$output || !this.$button) return;
 
-    /** @type {HTMLTextAreaElement | null} */
-    const $textarea = $form.querySelector('textarea[name="prompt"]')
-    /** @type {HTMLOutputElement | null} */
-    const $output = $form.querySelector('output[name="result"]')
-    if (!$textarea || !$output) return;
-    /** @type {HTMLButtonElement | null} */
-    const $button = $form.querySelector('button[type="submit"]')
-    if (!$button) return;
+    document.addEventListener('rewritten', this.onRewritten.bind(this));
+    this.$form.addEventListener('submit', this.onSubmit.bind(this));
+  }
 
-    let rewritten
-    document.addEventListener('rewritten', (event) => {
-      if ('detail' in event) {
-        rewritten = event.detail
-        // $button.disabled = false
-      }
-    })
+  onRewritten(event) {
+    if ('detail' in event) {
+      this.rewritten = event.detail;
+      // this.$button.disabled = false;
+    }
+  }
 
-    $form.addEventListener('submit', (event) => {
-      event.preventDefault()
-      $output.textContent = `You asked: ${$textarea.value}`
-      $output.style.visibility = 'visible'
-    })
+  onSubmit(event) {
+    event.preventDefault();
+    if (!this.$output || !this.$textarea) return;
+
+    this.$output.textContent = `You asked: ${this.$textarea.value}`;
+    this.$output.style.visibility = 'visible';
   }
 }
 customElements.define('language-model-section', LanguageModelSection);
