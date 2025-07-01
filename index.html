@@ -47,13 +47,17 @@
       }
       table {
         border-collapse: collapse;
-      }
-      th, td {
-        padding: 0.25rem 1rem;
-        border: transparent;
-      }
-      th {
-        text-align: left;
+        width: 100%;
+        th, td {
+          padding: 0.25rem 1rem;
+          border: transparent;
+        }
+        th {
+          text-align: left;
+          &:last-of-type {
+            width: 100%;
+          }
+        }
       }
       fieldset {
         padding: 1rem;
@@ -79,7 +83,7 @@
       }
       textarea {
         width: 100%;
-        height: 10rem;
+        height: 5rem;
         font-size: 1.1rem;
         padding: 0.5rem;
         border: none;
@@ -100,6 +104,10 @@
         &:disabled {
           opacity: 0.5;
           cursor: not-allowed;
+        }
+        &.smol {
+          font-size: 0.8rem;
+          padding: 0.25rem 0.5rem;
         }
       }
       output {
@@ -152,7 +160,6 @@
       </p>
 
       <api-availability></api-availability>
-      <model-availability></model-availability>
     </header>
 
     <main>
@@ -168,7 +175,6 @@
 
   <script type="module">
     import './elements/api-availability.js';
-    import './elements/model-availability.js';
     import './elements/writer-section.js';
     import './elements/rewriter-section.js';
     import './elements/summarizer-section.js';

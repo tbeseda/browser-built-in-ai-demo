@@ -22,7 +22,7 @@ class WriterSection extends HTMLElement {
           <fieldset>
             <legend>Keep it short, McCarthy</legend>
             <label for="prompt">Prompt the <code>Writer</code> for a short story</label>
-            <textarea name="prompt" placeholder=""></textarea>
+            <textarea name="prompt" placeholder="A simple subject or idea"></textarea>
             <output name="result"></output>
           </fieldset>
           <button type="button" id="proofread">Proofread</button>

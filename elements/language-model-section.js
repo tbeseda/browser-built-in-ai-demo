@@ -15,12 +15,12 @@ class LanguageModelSection extends HTMLElement {
   connectedCallback() {
     this.innerHTML = /* html */ `
       <section id="language-model">
-        <h2>LanguageModel</h2>
+        <h2><strike>LanguageModel</strike></h2>
         <form>
           <fieldset>
-            <legend>Magic 8-ball</legend>
-            <label for="prompt">Ask the <code>LanguageModel</code> about the story</label>
-            <textarea name="prompt" placeholder=""></textarea>
+            <legend>Ask me anything</legend>
+            <label for="prompt">Prompt the <code>LanguageModel</code> about the story</label>
+            <textarea name="prompt" placeholder="Access is unavailable 🫥"></textarea>
             <output name="result"></output>
           </fieldset>
           <button disabled type="submit">Ask</button>
