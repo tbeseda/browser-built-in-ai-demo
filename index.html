@@ -97,15 +97,21 @@
         background-color: #333;
         color: white;
         cursor: pointer;
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
       }
       output {
         display: block;
         visibility: hidden;
+        min-height: 3rem;
         border-radius: 0.25rem;
         padding: 0.5rem;
         margin-top: 0.5rem;
         font-size: 1.1rem;
-        font-weight: bold;
+        font-family: Seravek, sans-serif;
+        font-weight: 400;
         background-color: #eee;
       }
       footer {
@@ -151,7 +157,6 @@
 
     <main>
       <writer-section></writer-section>
-      <proofreader-section></proofreader-section>
       <rewriter-section></rewriter-section>
       <summarizer-section></summarizer-section>
       <translator-section></translator-section>
@@ -162,218 +167,12 @@
   </body>
 
   <script type="module">
-    class ApiAvailabilityDetails extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <details id="api-availability" open>
-            <summary>API availability</summary>
-            <table>
-              <tbody id="api-availability-tbody"></tbody>
-            </table>
-          </details>
-        `;
-        this.checkApiAvailability();
-      }
-      checkApiAvailability() {
-        const features = ['Translator', 'LanguageDetector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader', 'LanguageModel'];
-        const $apiTbody = this.querySelector('#api-availability-tbody');
-        const missing = [];
-        for (const feature of features) {
-          const $row = document.createElement('tr');
-          const $feature = document.createElement('td');
-          $feature.textContent = feature;
-          $row.appendChild($feature);
-          const $status = document.createElement('td');
-          if (window[feature]) {
-            $status.textContent = '🟢 available';
-          } else {
-            $status.textContent = '⛔️ nope';
-            missing.push(feature);
-          }
-          $row.appendChild($status);
-          $apiTbody.appendChild($row);
-        }
-        if (missing.length > 0) {
-          const $main = document.querySelector('main');
-          $main.innerHTML = '<p>This demo is not available in your browser. Please try a different browser.</p>';
-        } else {
-          this.querySelector('details').open = false;
-        }
-      }
-    }
-    customElements.define('api-availability', ApiAvailabilityDetails);
-
-    class ModelAvailabilityDetails extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <details id="model-availability" open>
-            <summary>Model availability</summary>
-            <table width="100%">
-              <tbody id="model-availability-tbody"></tbody>
-            </table>
-          </details>
-        `;
-        this.checkModelAvailability();
-      }
-      async checkModelAvailability() {
-        const $modelTbody = this.querySelector('#model-availability-tbody');
-        const $modelRow = document.createElement('tr');
-        const $modelFeature = document.createElement('td');
-        const modelStatus = await window.Summarizer?.availability?.() ?? 'unknown';
-        $modelFeature.textContent = `Model download ("${modelStatus}")`;
-        $modelRow.appendChild($modelFeature);
-        const $modelAction = document.createElement('td');
-        $modelAction.style.display = 'flex';
-        $modelAction.style.alignItems = 'center';
-        $modelAction.style.gap = '1rem';
-        const $modelProgress = document.createElement('progress');
-        $modelProgress.value = 0;
-        $modelProgress.max = 100;
-        $modelProgress.style.width = '100%';
-        const $modelButton = document.createElement('button');
-        $modelButton.textContent = modelStatus === 'downloaded' ? 'Downloaded' : 'Download';
-        $modelButton.disabled = modelStatus !== 'available';
-        $modelButton.addEventListener('click', async (e) => {
-          e.preventDefault();
-          if ($modelButton.disabled) return;
-          $modelButton.disabled = true;
-          $modelButton.textContent = 'Downloading...';
-          const progress = await window.Summarizer?.download?.();
-          $modelProgress.value = progress;
-        });
-        $modelAction.appendChild($modelButton);
-        $modelAction.appendChild($modelProgress);
-        $modelRow.appendChild($modelAction);
-        $modelTbody.appendChild($modelRow);
-      }
-    }
-    customElements.define('model-availability', ModelAvailabilityDetails);
-
-    class WriterSection extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <section id="writer">
-            <h2>Writer</h2>
-            <form>
-              <fieldset>
-                <legend>Keep it short, McCarthy</legend>
-                <label for="prompt">Prompt the <code>Writer</code></label>
-                <textarea name="prompt" placeholder=""></textarea>
-                <output name="result"></output>
-              </fieldset>
-              <button type="submit">Write</button>
-            </form>
-          </section>
-        `;
-      }
-    }
-    customElements.define('writer-section', WriterSection);
-
-    class ProofreaderSection extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <section id="proofreader">
-            <h2>Proofreader</h2>
-            <form>
-              <fieldset>
-                <legend>Let the model proofread the model. This is fine.</legend>
-                <output name="result"></output>
-              </fieldset>
-              <button type="submit">Proofread</button>
-            </form>
-          </section>
-        `;
-      }
-    }
-    customElements.define('proofreader-section', ProofreaderSection);
-
-    class RewriterSection extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <section id="rewriter">
-            <h2>Rewriter</h2>
-            <form>
-              <fieldset>
-                <legend>Like a remix</legend>
-                <label for="style">Choose a <code>Rewriter</code> style</label>
-                <select name="style">
-                  <option value="formal">Formal</option>
-                  <option value="informal">Informal</option>
-                  <option value="technical">Technical</option>
-                  <option value="creative">Creative</option>
-                  <option value="academic">Academic</option>
-                </select>
-                <output name="result"></output>
-              </fieldset>
-              <button type="submit">Rewrite</button>
-            </form>
-          </section>
-        `;
-      }
-    }
-    customElements.define('rewriter-section', RewriterSection);
-
-    class SummarizerSection extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <section id="summarizer">
-            <h2>Summarizer</h2>
-            <form>
-              <fieldset>
-                <legend>tldr</legend>
-                <output name="result"></output>
-              </fieldset>
-              <button type="submit">Summarize</button>
-            </form>
-          </section>
-        `;
-      }
-    }
-    customElements.define('summarizer-section', SummarizerSection);
-
-    class TranslatorSection extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <section id="translator">
-            <h2>Translator</h2>
-            <form>
-              <fieldset>
-                <legend>No, Canadian is not an option</legend>
-                <label for="language"><code>Translator</code> output language</label>
-                <select name="language">
-                  <option value="en">English</option>
-                  <option value="fr">French</option>
-                  <option value="de">German</option>
-                  <option value="es">Spanish</option>
-                </select>
-                <output name="result"></output>
-              </fieldset>
-              <button type="submit">Translate</button>
-            </form>
-          </section>
-        `;
-      }
-    }
-    customElements.define('translator-section', TranslatorSection);
-
-    class LanguageModelSection extends HTMLElement {
-      connectedCallback() {
-        this.innerHTML = `
-          <section id="language-model">
-            <h2>LanguageModel</h2>
-            <form>
-              <fieldset>
-                <legend>Magic 8-ball</legend>
-                <label for="prompt">Ask the <code>LanguageModel</code> about the translation</label>
-                <textarea name="prompt" placeholder=""></textarea>
-                <output name="result"></output>
-              </fieldset>
-              <button type="submit">Ask</button>
-            </form>
-          </section>
-        `;
-      }
-    }
-    customElements.define('language-model-section', LanguageModelSection);
+    import './elements/api-availability.js';
+    import './elements/model-availability.js';
+    import './elements/writer-section.js';
+    import './elements/rewriter-section.js';
+    import './elements/summarizer-section.js';
+    import './elements/translator-section.js';
+    import './elements/language-model-section.js';
   </script>
 </html>
