@@ -61,6 +61,8 @@ class SummarizerSection extends HTMLElement {
     for await (const chunk of stream) this.$output.textContent += chunk;
 
     summarizer.destroy();
+
+    document.dispatchEvent(new CustomEvent('teaser', { detail: this.$output.textContent }));
   }
 }
 customElements.define('summarizer-section', SummarizerSection);

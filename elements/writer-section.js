@@ -10,10 +10,6 @@ class WriterSection extends HTMLElement {
   /** @type {HTMLOutputElement | null} */
   $output = null;
 
-  get result() {
-    return this.textContent;
-  }
-
   async connectedCallback() {
     this.innerHTML = /* html */ `
       <section id="writer">
@@ -22,7 +18,7 @@ class WriterSection extends HTMLElement {
           <fieldset>
             <legend>Keep it short, McCarthy</legend>
             <label for="prompt">Prompt the <code>Writer</code> for a short story</label>
-            <textarea name="prompt" placeholder="A simple subject or idea"></textarea>
+            <textarea name="prompt" placeholder="Your best movie elevator pitch. Or just a simple subject/idea."></textarea>
             <output name="result"></output>
           </fieldset>
           <button type="button" id="proofread">Proofread</button>

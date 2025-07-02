@@ -18,6 +18,8 @@
 - Chrome [marketing](https://developer.chrome.com/docs/ai)
 - Chrome [marketing as docs](https://developer.chrome.com/docs/ai/built-in-apis)
 - [Gemini Nano](https://deepmind.google/models/gemini/nano/) is in Chrome 138+ (sorta)
+- [Microsoft Edge Docs aren't bad](https://learn.microsoft.com/en-us/microsoft-edge/web-platform/writing-assistance-apis)
+  - [Phi 4 mini](https://huggingface.co/microsoft/Phi-4-mini-instruct)
 - Love me [a good spec](https://webmachinelearning.github.io/writing-assistance-apis/)
 - MDN has (some) docs: [Summarizer](https://developer.mozilla.org/en-US/docs/Web/API/Summarizer)
 - tomac gave a [talk](https://www.youtube.com/watch?v=FNcDjQr_iqQ) with [slides](https://webengineshackfest.org/slides/built-in_ai_apis_for_the_web_by_thomas_steiner.pdf)
